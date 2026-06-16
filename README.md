@@ -57,6 +57,15 @@ RAM	~10–15 KB	~10–15 KB
 Example task	*n*-th prime for n=10¹¹ → ~0.02 % error in <1 µs	Factorise 64‑bit integer → milliseconds
 *Exact prime mode (yuct_exact) adds a single call to primepi (~0.3 s for n=10¹¹).*
 
+## Benchmark
+
+We provide a comparative benchmark script that evaluates both the
+logarithmic (`yuct_prime.py`) and the power‑law (`yuct_power_core.py`)
+kernels on ultra‑large orders (up to 150 trillion).
+
+```bash
+python benchmark_compare.py
+
 Documentation & Examples
 API Reference – see docstrings in the source files.
 
