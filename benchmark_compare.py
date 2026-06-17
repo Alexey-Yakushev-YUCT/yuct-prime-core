@@ -1,17 +1,26 @@
+#!/usr/bin/env python3
+"""
+Comparative benchmark of the three YUCT analytical kernels.
 
----
+Kernels tested:
+  - Logarithmic (v5.6 PURE YUCT)
+  - Power‑law (v14.0 POWER)
+  - Phase‑aware (v15.0 PHASE‑AWARE)
 
-## 2. `benchmark_compare.py`
+The script executes a parallel stress test (10 tasks, base order ~50 trillion),
+measures wall‑clock time, memory footprint, and optionally accuracy against
+the true *n*-th prime (requires `sympy`).
+"""
 
-```python
 import math
 import time
 import concurrent.futures
+import sys
 
-# ----------------------------------------------------------------------
-# Logarithmic kernel (v5.6) – full YUCT three‑loop correction
-# ----------------------------------------------------------------------
-def yuct_systemic_prime(n: int) -> int:
+# ---------------------------------------------------------------------------
+# Logarithmic kernel (v5.6)
+# ---------------------------------------------------------------------------
+def yuct_log_prime(n: int) -> int:
     if n <= 5:
         return [2, 3, 5, 7, 11][n - 1]
 
@@ -40,22 +49,64 @@ def yuct_systemic_prime(n: int) -> int:
     return int(round(R + corr1 + corr2 + corr3))
 
 
-# ----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # Power‑law kernel (v14.0)
-# ----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 _POWER_BASE = 0.9113
-_S_ODD = 1.2
-_S_EVEN = 0.8
-_KAPPA_C = 1 / 3
 
-def yuct_power_candidate(n: int) -> int:
+def yuct_power_prime(n: int) -> int:
     exponent = 1.0 + (1.0 - _POWER_BASE)
     return int(n ** exponent) | 1
 
 
-# ----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Phase‑aware kernel (v15.0)
+# ---------------------------------------------------------------------------
+_DELTA_N = 16.5
+_Q = (3/2) ** (1/3)
+
+PHASE_COEFFS = {
+    1: 0.44,
+    2: 0.00234,
+    3: 0.00012,
+}
+
+def get_phase(n: int) -> int:
+    if n <= 5:
+        return 1
+    N_f = math.log(n) / math.log(_Q)
+    phase = int((N_f - 80.0) / _DELTA_N) + 1
+    return max(1, phase)
+
+def yuct_phase_aware_prime(n: int) -> int:
+    if n <= 5:
+        return [2, 3, 5, 7, 11][n - 1]
+
+    ln_n = math.log(n)
+    ln_ln_n = math.log(ln_n)
+    base = n * (ln_n + ln_ln_n - 1 + (ln_ln_n - 2) / ln_n)
+
+    N_f = ln_n / math.log(_Q)
+    sign_gate = 1.0 if math.sin((math.pi / _DELTA_N) * (N_f - 80.0)) >= 0 else -1.0
+
+    corr1 = sign_gate * (-0.4) * (n ** (1/3)) * ln_n
+    corr2 = -2.4 * (n ** (1/3)) * (ln_ln_n ** 1.5)
+    corr3 = 0.0
+    if N_f > 133.0:
+        ln_ln_ln_n = math.log(ln_ln_n)
+        corr3 = - (1.2 * 0.8) / ((1/3) * 19) * (n ** (1/3)) * ln_ln_ln_n * (N_f / 96.0)
+
+    k = get_phase(n)
+    C = PHASE_COEFFS.get(k, 0.00001)
+    corr4 = sign_gate * C * (n ** 1.124)
+
+    candidate = int(round(base + corr1 + corr2 + corr3 + corr4))
+    return candidate | 1
+
+
+# ---------------------------------------------------------------------------
 # Benchmark helpers
-# ----------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 def run_parallel_test(kernel_func, tasks, label=""):
     """Execute *kernel_func* in a ThreadPoolExecutor and collect timings."""
     results = []
@@ -82,55 +133,49 @@ def run_parallel_test(kernel_func, tasks, label=""):
 
 
 def main():
-    base_n = 50_000_000_000_000
-    step = 100_000_000_000
+    base_n = 50_000_000_000_000   # 50 trillion
+    step = 100_000_000_000        # 100 billion
     num_tasks = 10
     tasks = [base_n + i * step for i in range(num_tasks)]
 
     print("=" * 80)
-    print("YUCT CORES BENCHMARK")
+    print("YUCT CORES COMPARATIVE BENCHMARK")
     print(f"Base n: {base_n:,}   Step: {step:,}   Tasks: {num_tasks}")
     print("=" * 80)
 
-    # --- Logarithmic kernel ---
-    print("\n[1] Logarithmic kernel (v5.6)")
-    log_results, log_total = run_parallel_test(
-        yuct_systemic_prime, tasks, "log"
-    )
-    log_times = [r["time_ms"] for r in log_results]
-    print(f"  Total pool time: {log_total:.4f} ms")
-    print(f"  Avg time/task:   {sum(log_times)/len(log_times):.4f} ms")
-    print(f"  Min time:        {min(log_times):.4f} ms")
-    print(f"  Max time:        {max(log_times):.4f} ms")
-    print(f"  RAM additional:  0 bytes")
-    # Print first task candidate
-    print(f"  Candidate (n={tasks[0]}): {log_results[0]['candidate']}")
+    kernels = {
+        "Logarithmic (v5.6)": yuct_log_prime,
+        "Power‑law (v14.0)": yuct_power_prime,
+        "Phase‑aware (v15.0)": yuct_phase_aware_prime,
+    }
 
-    # --- Power‑law kernel ---
-    print("\n[2] Power‑law kernel (v14.0)")
-    pow_results, pow_total = run_parallel_test(
-        yuct_power_candidate, tasks, "pow"
-    )
-    pow_times = [r["time_ms"] for r in pow_results]
-    print(f"  Total pool time: {pow_total:.4f} ms")
-    print(f"  Avg time/task:   {sum(pow_times)/len(pow_times):.4f} ms")
-    print(f"  Min time:        {min(pow_times):.4f} ms")
-    print(f"  Max time:        {max(pow_times):.4f} ms")
-    print(f"  RAM additional:  0 bytes")
-    print(f"  Candidate (n={tasks[0]}): {pow_results[0]['candidate']}")
+    all_results = {}
 
-    # --- Accuracy estimation (requires sympy.primepi for exact n-th prime) ---
-    print("\n[3] Accuracy estimation")
+    for name, func in kernels.items():
+        print(f"\n--- {name} ---")
+        res, total = run_parallel_test(func, tasks, name)
+        times = [r["time_ms"] for r in res]
+        print(f"  Total pool time: {total:.4f} ms")
+        print(f"  Avg time/task:   {sum(times)/len(times):.4f} ms")
+        print(f"  Min time:        {min(times):.4f} ms")
+        print(f"  Max time:        {max(times):.4f} ms")
+        print(f"  RAM additional:  0 bytes")
+        print(f"  Candidate (n={tasks[0]}): {res[0]['candidate']}")
+        all_results[name] = res
+
+    # Accuracy estimation (requires sympy)
+    print("\n" + "=" * 80)
+    print("ACCURACY ESTIMATION")
+    print("=" * 80)
     try:
         from sympy import primepi
     except ImportError:
-        print("  sympy not installed; skipping accuracy check.")
-        print("  Install with: pip install sympy")
+        print("sympy not installed; skipping accuracy check.")
+        print("Install with: pip install sympy")
         return
 
-    # Find true p_n for the first task using binary search + primepi
     n_target = tasks[0]
-    # Approximate search boundaries
+    # Binary search for true p_n
     lo = int(n_target * math.log(n_target) * 0.9)
     hi = int(n_target * math.log(n_target) * 1.3)
     true_p = None
@@ -145,26 +190,15 @@ def main():
             true_p = mid
             break
     if true_p is None:
-        # fallback linear search around the candidate
-        for p in range(int(log_results[0]['candidate']*0.9), int(log_results[0]['candidate']*1.1)):
-            if primepi(p) == n_target:
-                true_p = p
-                break
-    if true_p is None:
-        print("  Could not determine true p_n for accuracy check.")
+        print("Could not determine true p_n; accuracy check skipped.")
         return
 
-    print(f"  True p_{n_target} = {true_p}")
-
-    log_cand = log_results[0]['candidate']
-    pow_cand = pow_results[0]['candidate']
-    log_err = abs(log_cand - true_p)
-    pow_err = abs(pow_cand - true_p)
-    log_acc = 100.0 * (1.0 - log_err / true_p) if true_p > 0 else 0.0
-    pow_acc = 100.0 * (1.0 - pow_err / true_p) if true_p > 0 else 0.0
-
-    print(f"  Logarithmic kernel: error = {log_err}, accuracy = {log_acc:.4f}%")
-    print(f"  Power‑law kernel:   error = {pow_err}, accuracy = {pow_acc:.4f}%")
+    print(f"True p_{n_target} = {true_p}\n")
+    for name, res in all_results.items():
+        cand = res[0]["candidate"]
+        err = abs(cand - true_p)
+        acc = 100.0 * (1.0 - err / true_p) if true_p > 0 else 0.0
+        print(f"{name}: error = {err}, accuracy = {acc:.4f}%")
 
     print("\n" + "=" * 80)
     print("BENCHMARK COMPLETE")
