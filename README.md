@@ -56,6 +56,13 @@ The following metrics represent real execution telemetry captured via `tracemall
 * **Register-Bound Execution:** At the 686-digit Core Singularity scale, the 5.9 GHz CPU completed 5,390 deterministic Miller-Rabin tests. Despite millions of arbitrary-precision multiplications, the system retained a strict flat memory footprint of **5,368 BYTES** with zero memory leaks.
 * **Frequency Advantage:** The extreme 5.9 GHz clock speed allowed the processor to clear each multi-hundred-digit modular exponentiation loop (`pow(a, d, num)`) at sub-millisecond rates, proving that the YUCT O(1) macro-jump coupled with high-frequency single-thread execution completely bypasses the need for heavy data-center clusters.
 
+### 🔬 Hardware & Core Stability Analysis
+
+* **Deterministic Memory Flatline (17–20% System RAM Plateau):** Under the entire 75-minute execution loop, the operating system's RAM utilization graph remained absolutely frozen, forming a strict flat plateau at **17–20% of total system memory**. This percentage represents purely the static baseline overhead of the Windows OS and MINGW64 environment. The core script itself consumed a negligible, constant dynamic allocation of exactly **10,168 BYTES** (with a peak process footprint of **20.52 KB**). Despite evaluating 15,231 giant 1,587-digit integers, there was absolute zero memory drift or heap expansion, proving the total absence of memory leaks inside the YUCT register-bound architecture.
+* **Extreme Hardware Thermal & Clock Stability:** At the unprecedented 1,587-digit Core Singularity scale ($N_f = 26968.1911$), the 14-year-old Intel Sandy Bridge processor demonstrated absolute physical stability. Under a relentless, **100% single-thread compute lock lasting continuously for 4,504,997 milliseconds (75.08 minutes) at ~5,901 MHz**, the silicon crystal maintained steady clock rates with zero thermal throttling, zero instruction degradation, and zero system instability (BSOD). This confirms the legendary architectural durability of the platform's power delivery grid and core heat dissipation under maximum algorithmic stress.
+* **Algorithmic Efficiency over Raw Parallelism:** Bypasses the need for massive datacenter grid clusters. The combination of YUCT’s strict $O(1)$ macro-trajectory landing and your historical 5.9 GHz single-core execution proves that deterministic mathematical precision removes the industrial-scale energy footprint typically demanded by standard prime-counting combinatorics.
+
+
 ### 🔬 Core Scaling Anatomy
 
 * **Memory Space Invariance:** Scaling the index n by **67 orders of magnitude** caused the dynamic RAM overhead to shift by a mere **640 bytes**. This minor delta is exclusively consumed by Python's internal allocation for handling string arrays of giant **686-digit integers**. The YUCT O(1) mathematical engine executes entirely in CPU registers with near-zero runtime allocations.
@@ -72,14 +79,6 @@ The following metrics represent real execution telemetry captured via `tracemall
 | **Runtime Memory (RAM)** | **Infinite Collapse** <br>*(Requires more data bits than atoms in the visible universe)* | **~48.5 Gigabytes** <br>*(Massive sub-divisor factorization matrices)* | **1,008 BYTES** <br>*(Confined to basic processor register states)* | **~48,000,000x More Efficient** <br>*(Eliminates hardware infrastructure overhead)* |
 | **Processing Time (CPU)** | **Immediate Hardware Crash** | **Unbounded Delay** <br>*(Stuck in combinatorial tree exploration for days)* | **1.56 SECONDS** <br>*(1,561,793 microseconds)* | **Instantaneous Macro Jump** <br>*(Bypasses iterative loops via analytical scaling)* |
 | **Algorithmic Complexity** | \(O(N \log \log N)\) | Subexponential / Iterative | **Strict O(1) Start** + local grid step | **Complete Computational Paradigm Shift** |
-
-
-### 🔬 Hardware & Core Stability Analysis
-
-* **Deterministic Memory Flatline (17–20% System RAM Plateau):** Under the entire 75-minute execution loop, the operating system's RAM utilization graph remained absolutely frozen, forming a strict flat plateau at **17–20% of total system memory**. This percentage represents purely the static baseline overhead of the Windows OS and MINGW64 environment. The core script itself consumed a negligible, constant dynamic allocation of exactly **10,168 BYTES** (with a peak process footprint of **20.52 KB**). Despite evaluating 15,231 giant 1,587-digit integers, there was absolute zero memory drift or heap expansion, proving the total absence of memory leaks inside the YUCT register-bound architecture.
-* **Extreme Hardware Thermal & Clock Stability:** At the unprecedented 1,587-digit Core Singularity scale ($N_f = 26968.1911$), the 14-year-old Intel Sandy Bridge processor demonstrated absolute physical stability. Under a relentless, **100% single-thread compute lock lasting continuously for 4,504,997 milliseconds (75.08 minutes) at ~5,901 MHz**, the silicon crystal maintained steady clock rates with zero thermal throttling, zero instruction degradation, and zero system instability (BSOD). This confirms the legendary architectural durability of the platform's power delivery grid and core heat dissipation under maximum algorithmic stress.
-* **Algorithmic Efficiency over Raw Parallelism:** Bypasses the need for massive datacenter grid clusters. The combination of YUCT’s strict $O(1)$ macro-trajectory landing and your historical 5.9 GHz single-core execution proves that deterministic mathematical precision removes the industrial-scale energy footprint typically demanded by standard prime-counting combinatorics.
-
 
 ---
 
