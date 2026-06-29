@@ -28,6 +28,8 @@ The following metrics represent real execution telemetry captured via `tracemall
 | **\(10^{13}\)** <br>*(10 Trillion)* | 15-digit numbers | `330,436,926,509,577` | **171,666 µs** <br>*(0.171 sec)* | **668 BYTES** | 1.06 KB | ✅ Verified |
 | **\(10^{33} + 111\)** <br>*(1 Decillion)* | 36-digit numbers | `823,426,001,632,547...` | **681,678 µs** <br>*(0.681 sec)* | **768 BYTES** | 1.77 KB | ✅ Verified |
 | **\(10^{72} + 111\)** <br>*(1 Duodecillion)* | 76-digit numbers | `1,798,449,604,208,084...` | **1,561,793 µs** <br>*(1.561 sec)* | **1,008 BYTES** | 2.18 KB | ✅ Verified |
+| **\(10^{682} + 111\)** <br>*(Core Singularity)* | 686-digit numbers | `1,577,386,205,021...` | **300,189 ms** <br>*(5.00 min)* | **5,368 BYTES** | 18.64 KB | ✅ Verified (7,907 Tested) |
+
 
 ### 🔬 Core Scaling Anatomy
 
