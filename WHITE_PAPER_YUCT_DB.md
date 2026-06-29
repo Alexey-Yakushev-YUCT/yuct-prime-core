@@ -1,7 +1,7 @@
 # WHITE PAPER: YUCT-DB
 ## Next-Generation Database Architecture via Deterministic Prime Node Coordination and O(1) Asymptotics
 
-**Author:** Alexey Yakushev  
+**Author:** Alexey V. Yakushev  
 **Theoretical Framework:** Yakushev Unified Coordination Theory (YUCT)  
 **Scientific Repository:** yuct-prime-core  
 **Digital Object Identifier (DOI):** 10.5281/zenodo.18444598  
