@@ -22,11 +22,12 @@
 
 The following metrics represent real execution telemetry captured via `tracemalloc` inside the MINGW64 environment.
 
-### 💻 Reference Hardware Specification
-* **CPU Count:** 1 Physical Processor
-* **Processor Architecture:** Intel64 Family 6 Model 42 Stepping 7 (GenuineIntel)
-* **Core Frequency:** **~5,901 MHz (5.9 GHz Extreme Overclock Core)**
-* **Environment:** Windows MINGW64 / Git Bash Runtime Platform
+* ### 💻 Reference Hardware Specification (The Historic Sandy Bridge Overclock)
+* **CPU Model:** Intel Core i7-2600K / i5-2500K (Intel64 Family 6 Model 42 Stepping 7)
+* **Motherboard:** Gigabyte Technology Co., Ltd. (BIOS Version F18, 2012-08-21)
+* **Core Frequency:** **~5,901 MHz (5.9 GHz Historical Extreme Silicon Lottery Overclock)**
+* **System Memory:** 24,011 MB Total Physical RAM (7,540 MB Available at runtime)
+* **Platform:** Windows x64 MINGW64 / Git Bash Shell Runtime Environment
 
 ### Core Multi-Scale Benchmark Matrix
 
